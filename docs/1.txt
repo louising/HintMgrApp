@@ -1,0 +1,160 @@
+
+1. app.js
+App({
+  onLaunch: function() {
+    let that = this;
+    wx.login({
+      success: function (res) {
+        //console.log(res.code);
+        if (res.code) {
+          wx.request({
+            url: that.globalData.host + '/xxx/xxx/xxxx/xxxx,//这里写自己java后台的请求地址
+            method: 'POST',
+            data: { code: res.code },
+            header: {
+              'content-type': 'application/x-www-form-urlencoded'
+            },
+            success(res) {
+              //console.log('用户登录成功！id=' + res.data.session_key);
+              wx.setStorageSync("userid", res.data.userid);//将用户id保存到缓存中
+              wx.setStorageSync("session_key", res.data.session_key);//将session_key保存到缓存中
+            }
+          })
+        } else {
+          console.log('获取用户登录态失败！' + res.errMsg)
+        }
+      }
+    })
+  },
+  globalData: {
+    host: 'http://localhost:80'
+  }
+})
+
+2. java
+ import net.sf.json.JSONObject;//解析json字符串所需的包
+ 
+/**maven依赖如下
+<!-- 解析JSON所需包-->
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib-ext-spring</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+**/
+
+/*******************************小程序********************************/
+    @PostMapping("/xxxx/xxxx")
+    @ResponseBody
+    public AjaxResult mini_Login(HttpServletRequest request,@Param("code") String code) {
+        //String c=request.getParameter("code");//也可以通过此语句获取code值
+        //System.out.println(code);
+        AjaxResult res=new AjaxResult();//这里是自定义类，用于封装返回的数据，你可以用map替代
+        String result="";
+        try{//请求微信服务器，用code换取openid。HttpUtil是工具类，后面会给出实现，Configure类是小程序配置信息，后面会给出代码
+            result = HttpUtil.doGet(
+                    "https://api.weixin.qq.com/sns/jscode2session?appid="
+                            + Configure.mini_appID + "&secret="
+                            + Configure.mini_secret + "&js_code="
+                            + code
+                            + "&grant_type=authorization_code", null);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        //System.out.println(result);
+        JSONObject jsonObj = JSONObject.fromObject(result);//解析从微信服务器上获取到的json字符串
+        System.out.println("用户的openid为："+jsonObj.get("openid"));//此处也可以得到session_key的值
+        res.put("session_key",jsonObj.get("session_key").toString());
+        // Miniuser 类是自己的业务类，你可以根据自己需要自行定义
+        Miniuser miniuser=miniuserService.isRegister(jsonObj.get("openid").toString());//去数据库判断用户是否存在该用户
+        if(miniuser!=null)//如果存在该用户
+        {
+            res.put("userid",miniuser.getMini_id());//将用户id返回
+            return res;
+        }
+        //如果是新用户，就添加用户到数据库中
+        Miniuser userInfo=new Miniuser();//封装小程序对象
+        userInfo.setMini_openid(jsonObj.get("openid").toString());
+        //将用户信息保存到数据库中
+        miniuserService.saveMiniUser(userInfo);
+        res.put("userid",miniuserService.isRegister(jsonObj.get("openid").toString()).getMini_id());
+        return res;
+    }
+
+3.
+package xxx.xxxxxx.xxxxxxxx.xxxxxxxxxx;
+ 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.httpclient.HttpStatus;//此类需要添加maven依赖或jar包
+ 
+/** 将此依赖添加到pom.xml中
+<!-- HttpUtils所需包-->
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
+**/
+ 
+public class HttpUtil {
+ 
+    public static String doGet(String urlPath, HashMap<String, Object> params)
+            throws Exception {
+        StringBuilder sb = new StringBuilder(urlPath);
+        if (params != null && !params.isEmpty()) { // 说明有参数
+            sb.append("?");
+ 
+            Set<Entry<String, Object>> set = params.entrySet();
+            for (Entry<String, Object> entry : set) { // 遍历map里面的参数
+                String key = entry.getKey();
+                String value = "";
+                if (null != entry.getValue()) {
+                    value = entry.getValue().toString();
+                    // 转码
+                    value = URLEncoder.encode(value, "UTF-8");
+                }
+                sb.append(key).append("=").append(value).append("&");
+            }
+ 
+            sb.deleteCharAt(sb.length() - 1); // 删除最后一个&
+        }
+        // System.out.println(sb.toString());
+        URL url = new URL(sb.toString());
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setConnectTimeout(5000); // 5s超时
+        conn.setRequestMethod("GET");
+ 
+        if (conn.getResponseCode() == HttpStatus.SC_OK) {// HttpStatus.SC_OK ==
+            // 200
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    conn.getInputStream()));
+            StringBuilder sbs = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sbs.append(line);
+            }
+            // JSONObject jsonObject = new JSONObject(sbs.toString());
+            return sbs.toString();
+        }
+ 
+        return null;
+    }
+}

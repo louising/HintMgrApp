@@ -1,0 +1,47 @@
+# ENV: SIT
+
+server:
+    context-path: /hintmgr
+    port: 8080
+    session:
+        cookie:
+            name: JSESSIONID
+            domain: zero.com
+            path: /
+            http-only: false
+            secure: false
+            max-age: -1
+
+# start DB server, java -jar "H:/lib/java/h2-1.4.197.jar"
+# multipart which refer to MultipartProperties
+spring:
+    datasource:
+        type: org.apache.tomcat.jdbc.pool.DataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/pim?useUnicode=true&characterEncoding=UTF8&allowMultiQueries=true&useSSL=false
+        username: root
+        password: root
+        initialSize: 10
+        maxActive: 5
+        maxIdle: 3
+    http:
+        multipart:
+            max-file-size: 100MB
+            max-request-size: 200MB
+
+appConf:
+    configPath: D:/workspace/workspace_ee/HintMgrApp/docs/
+    version: 20211120
+    rootPwd: pDs+kBgy/KYr1LS8HJuogQ==
+    appId: wx5d20bbaa4edaae10
+    appSecret: 7248c88ec055b4f77786de1bf5d7697d
+    
+oss:    
+    endpoint: "https://oss-cn-guangzhou.aliyuncs.com"
+    accessKey: "LTAI5t8M6cuo3dFJHoN1ZrqM"
+    secretKey: "SCEcwVfnY1yYmrVP16tty3bcxCDrsm"
+    bucket: "sw-clue"
+    
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl    

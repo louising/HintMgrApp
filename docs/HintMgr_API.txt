@@ -1,0 +1,74 @@
+register(code, inviteCode, userName, tel) //邀请码
+login(code) //miniApp generated code
+loginAdmin(pwd);
+
+管理后台 /admin
+---------------------------------
+数据统计
+	statistic()  //总项目数，总线索数 总跟进数 总用户数 总销售员 总拓客员		
+	statisticHints(date1,date2)
+	statisticUsers(date1,date2)
+
+线索列表
+	importHint(file, hintLevel) //导入的线索不需要审核
+	downloadHintTemplate() 下载模板
+	
+    OK findHints(projectName,itemType,corpName,customerName, askStatus, auditStatus)
+	OK saveHint(obj) //创建线索
+	OK getHintDetail(hintId) //线索详情，联系人，跟进内容
+	OK assignHint(hintId, userId)
+	OK delHint(hintId) //also delete HintRecord, HintPic...
+   
+    OK auditHint(hintId, auditStatus)
+	
+	findHintRecords(projectName,hintName,corpName,userName,customerName) //线索跟进列表
+	
+项目列表
+	findProjects(projectName)
+	setAdmin(projectId, userId, adminType:1-aproject 2-area, operType:1-set 2-cancel)
+	saveProject(projectId, projectName,projectAdminUserId, areaAdminUserId,desc)
+	findProjectMembers(projectId)
+	setMember(projectId, userIds, operType:1-add 2-cancel)
+	findAllUsers() //用户如果是一般角色, 应该不在其他项目里面. 不搜索admin
+	findOtherProjec(projectId) //not contains this //progress project
+	moveMembers(projectId, userIds)
+员工管理
+	findUsers(tel, userName, roleName)
+	setUserStatus(userId, userStatus)
+	
+	findInviteCodes(roleIds, statuses)
+	discardInviteCode(inviteCode)
+	
+	findRoles()
+	saveRole(roleId, roleName, position, roleDesc, hintLevel)
+	delRole(roleId) //del user, del role,
+
+OK 数据字典-客户类别 //01=CustomerType 02=ItemType 03=HintType 04=HintLevel
+	
+管理员(APP) /app/mgr/
+------
+findMyProjects(projectName) //根据当前用户身份 项目管理员 区域管理员 //校验权限 {项目管理员,项目名称,销售员，拓客员，线索数, 创建时间}
+findHints(projectName) //未认领，已认领 在前端过滤(Performance)
+findHintUsers() //查找可以分配线索的用户 2类角色(销售员 拓客员)
+--> assignHint(hintId, userId)
+--> getHintDetail(hintId)
+	
+用户端(APP) /app/user/
+------
+findPublicHint(itemType) //公共线索池 by user's projects,hintLevel, asked=0) 有效时间内 审核通过,后台录入导入的默认审核通过
+askHint(hintId) //公共线索池: 认领 set asked=1, time, owner
+线索详情 -> getHintDetail(hintId)
+myHint(itemType); //我的线索: 认领列表 ower=I, 新增的列表 owner=I  按审核方式筛选-在前端过滤
+
+freeHint(hintId) //退回线索
+
+addHintRecord(hintId, content) //新增跟进内容
+updateHintRemark(hintId, remark) //修改备注
+创建线索 --> addHint(obj) //状态为审核中. 上传图片后，返回图片ID, 提交的时候，提交图片Ids,
+修改线索 --> updateHint(obj) //修改状态为审核中
+删除线索 --> delHint(hintId)
+个人中心 findMyInfo() //所属项目，跟进数目 新增数目
+线索排名
+	getAddRank() //名次，列表
+	getAskRank() //名词，列表
+	

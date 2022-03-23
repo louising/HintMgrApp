@@ -1,0 +1,18 @@
+小程序新增或修改功能：
+1、取消审核机制，管理员和区域管理员不用审核机制，但还需要上传图片
+TODO: 所有跟审核状态相关的过滤都去掉
+
+OK ADD API: getProjectIdNames() // 查询当前用户的项目列表 . Return [{projectId:001, projectName:AAA}]
+GET /app/mgr/projects
+
+2、项目管理员和区域管理员新增线索，可以新增不同项目线索，并且线索等级也可以不同，项目管理员和区域管理员不计算在排名里
+TODO UPD: 项目管理员和区域管理员不计算在排名里
+
+3、项目管理员和区域管理员个人中心增加统计新增线索总数字段
+OK ADD: 我的线索 //当前用户是 项目管理员 和 区域管理员 是否可以查询我的线索
+
+后台管理 
+上传的图片在线索详情里面一直可看
+OK UPD: 所有查询线索详情的接口，都加上图片地址(fullUrl, shortUrl)
+OK GET admin/hintDetails?hintId=xxx
+OK GET /app/mgr/hintDetails?hintId=xx

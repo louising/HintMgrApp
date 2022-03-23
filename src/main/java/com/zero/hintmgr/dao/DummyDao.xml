@@ -1,0 +1,1134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zero.hintmgr.dao.DummyDao">
+    <!-- Invite Code -->
+    <select id="findInviteCodeCount" resultType="java.lang.Integer">
+        select count(1) RecordCount from t_invite_code where invite_code=#{inviteCode}    
+    </select>
+    <select id="getInviteCode" resultType="map">
+        select I.*, r.role_position 
+        from t_invite_code I, t_role r 
+        where I.role_id=r.role_id and invite_code=#{inviteCode}
+    </select>
+    <update id="updateInviteCode"  parameterType="map">
+        update t_invite_code set open_id =#{open_id}, code_status='1', used_time=CURRENT_TIMESTAMP() 
+        where invite_code=#{invite_code}    
+    </update>    
+    <update id="discardInviteCode">
+        update t_invite_code 
+        set code_status='2' 
+        where invite_code=#{invite_code}    
+    </update>
+    
+    <sql id="sqlFindInviteCodePage">
+        select p.project_name,r.role_name,i.invite_code,i.used_time,i.code_status,i.create_time 
+        from t_invite_code i, t_project p, t_role r
+        where i.project_id=p.project_id and i.role_id=r.role_id
+        <if test="role_id!=null and role_id!=''">
+            and i.role_id =#{role_id}
+        </if>
+        <if test="code_status!=null and code_status!=''">
+            and i.code_status =#{code_status} 
+        </if>
+        <if test="invite_code!=null and invite_code!=''">
+            and i.invite_code like '%${invite_code}%' 
+        </if>
+        <if test="project_name!=null and project_name!=''">
+            and p.project_name like '%${project_name}%' 
+        </if>                
+        order by i.create_time desc      
+    </sql>
+    <select id="findInviteCodePage" parameterType="map" resultType="map">
+        <include refid="sqlFindInviteCodePage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findInviteCodePageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindInviteCodePage"/>) a
+    </select>
+    
+    <select id="getAllInviteCodes" resultType="string">
+        select invite_code from t_invite_code
+    </select>
+    <insert id="addInviteCode" parameterType="map">
+        insert into t_invite_code(invite_code,project_id,role_id)
+        values (
+            #{invite_code,   jdbcType=VARCHAR}, 
+            #{project_id,   jdbcType=VARCHAR},
+            #{role_id, jdbcType=VARCHAR}
+        )
+    </insert>  
+
+    <!-- User -->    
+    <select id="getUserByOpenId" resultType="map">
+        select * from t_user where open_id=#{arg0}
+    </select>
+    <!-- 
+    <select id="getUserInfo" resultType="map">
+        select u.*,r.role_name,r.role_position,p.project_name,p.project_id
+        from t_user u,t_role r,t_project p 
+        where open_id=#{arg0}
+          and u.role_id=r.role_id and u.project_id=p.project_id
+    </select>    
+    -->
+        
+    <select id="getUserByUserId" resultType="map">
+        select u.*,  r.role_position,r.role_name,r.hint_level,IFNULL(p.project_name,'') project_name
+        from t_user u
+            inner join t_role r on u.role_id=r.role_id 
+            left join t_project p on u.project_id=p.project_id
+        where user_id=#{arg0}    
+    </select>
+    
+    <insert id="addUser" parameterType="map">
+        insert into t_user (user_id,open_id,user_name,nickName,avatarObjectName,  tel,role_id,project_id,invite_code)
+        values (
+            #{user_id,   jdbcType=VARCHAR}, 
+            #{open_id,   jdbcType=VARCHAR},
+            #{user_name, jdbcType=VARCHAR},
+            #{nickName, jdbcType=VARCHAR},
+            #{avatarObjectName, jdbcType=VARCHAR},
+            
+            #{tel,       jdbcType=VARCHAR},
+            #{role_id,   jdbcType=VARCHAR},
+            #{project_id,   jdbcType=VARCHAR},
+            #{invite_code,   jdbcType=VARCHAR}         
+        )
+    </insert>
+    <update id="resetUser">
+        update t_user set avatarObjectName='', tel='', nickName='' where user_id=#{arg0}
+    </update>
+    <select id="getUserCountByRoleId" resultType="int">
+        select count(1) RecordCount from t_user where role_id = #{arg0}
+    </select>
+
+    <!-- Role -->
+    <select id="getRole" resultType="map">
+        select * from t_role where role_id=#{arg0}
+    </select>
+        
+    <insert id="addRole" parameterType="map">
+        insert into t_role(role_id,role_name,role_desc,hint_level,role_position)
+        values (
+            #{role_id,    jdbcType=VARCHAR}, 
+            #{role_name,  jdbcType=VARCHAR},
+            #{role_desc,  jdbcType=VARCHAR},
+            #{hint_level_id,  jdbcType=VARCHAR},
+            #{role_position,  jdbcType=VARCHAR}
+        )
+    </insert>
+            
+    <update id="updRole" parameterType="map">
+        update t_role set 
+          role_name = #{role_name}, 
+          role_desc = #{role_desc},
+          hint_level = #{hint_level_id},
+          role_position = #{role_position}
+        where role_id = #{role_id}
+    </update>    
+    <update id="delRole">
+        delete from t_role
+        where role_id = #{role_id}
+    </update>    
+    
+    <sql id="sqlFindRolesPage">
+        select r.role_id,r.role_name,r.role_position,r.hint_level,IFNULL(r.role_desc,'') role_desc,r.create_time,  d.dict_name hint_level_name
+        from t_role r left join t_dict d on r.hint_level=d.dict_id        
+        order by r.create_time desc
+    </sql>
+    <select id="findRolesPage" parameterType="map" resultType="map">
+        <include refid="sqlFindRolesPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findRolesPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindRolesPage"/>) a
+    </select>
+    
+
+    <!-- Project -->
+    <insert id="addProject" parameterType="map">
+        insert into t_project (project_id,project_name,project_admin_id,project_area_admin_id,project_desc)
+        values (
+            #{project_id,            jdbcType=VARCHAR}, 
+            #{project_name,          jdbcType=VARCHAR},
+            #{project_admin_id,      jdbcType=VARCHAR},
+            #{project_area_admin_id, jdbcType=VARCHAR},
+            #{project_desc,          jdbcType=VARCHAR}
+        )
+    </insert>    
+    <update id="updProject" parameterType="map">
+        update t_project set 
+          project_name = #{project_name}, 
+          project_admin_id = #{project_admin_id},
+          project_area_admin_id = #{project_area_admin_id},
+          project_desc = #{project_desc}
+        where project_id = #{project_id}
+    </update>
+    <update id="updProjectAreaAdminJoinTime" parameterType="map">
+        update t_project set area_admin_join_time = CURRENT_TIMESTAMP where project_id = #{project_id}
+    </update>
+    <update id="updProjectAdminJoinTime" parameterType="map">
+        update t_project set project_admin_join_time = CURRENT_TIMESTAMP where project_id = #{project_id}
+    </update>
+        
+    <update id="setProjectAdmin" parameterType="map">
+        update t_project set
+            <if test="project_admin_id!=null and project_admin_id!=''">
+                project_admin_id = #{project_admin_id},
+            </if>
+            <if test="project_area_admin_id!=null and project_area_admin_id!=''">
+                project_area_admin_id = #{project_area_admin_id},
+            </if>
+            update_time = CURRENT_TIMESTAMP
+        where project_id = #{project_id}
+    </update>
+    
+    <update id="setProjectAreaAdminId" parameterType="map">
+        update t_project set
+            project_area_admin_id = #{project_area_admin_id},
+            update_time = CURRENT_TIMESTAMP
+        where project_id = #{project_id}
+    </update>
+    <update id="setProjectAdminId" parameterType="map">
+        update t_project set
+            project_admin_id = #{project_admin_id},
+            update_time = CURRENT_TIMESTAMP
+        where project_id = #{project_id}
+    </update>        
+    
+    <select id="getProject" resultType="map">
+        select * from t_project where project_id=#{arg0}
+    </select>
+    <select id="getProjectId" resultType="string">
+        select project_id from t_project where project_name=#{project_name}
+    </select>
+    <update id="delProject">
+        delete from t_project
+        where project_id = #{project_id}
+    </update>
+    <update id="archiveProject">
+        update t_project set
+          project_status='2'
+        where project_id = #{project_id}
+    </update>
+    <update id="clearUserProject">
+        update t_user set project_id=null where project_id=#{arg0}
+    </update>
+        
+    <update id="quitProject">
+        update t_user set
+          project_id = ''
+        where project_id = #{project_id} and user_id in(${userIds})
+    </update>
+    <update id="joinProject">
+        update t_user set
+          project_id = #{project_id}
+        where user_id in(${userIds})
+    </update>
+    
+    <sql id="sqlFindProjectPage">
+        select p.*, projectUser.user_name project_admin_name, areaUser.user_name project_area_admin_name
+        from t_project p
+          left join t_user projectUser on p.project_admin_id=projectUser.user_id
+          left join t_user areaUser on p.project_area_admin_id=areaUser.user_id
+        where 1=1 
+        <if test="project_name!=null and project_name!=''">
+            and project_name like '%${project_name}%'
+        </if>
+        order by p.create_time desc       
+    </sql>
+    <select id="findProjectPage" parameterType="map" resultType="map">
+        <include refid="sqlFindProjectPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findProjectPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindProjectPage"/>) a
+    </select> 
+    
+    <select id="adminUsers" resultType="map">
+        select u.user_id,u.user_name,r.role_position 
+        from t_user u, t_role r 
+        where u.role_id=r.role_id and r.role_position in(1,2)
+    </select>
+    
+    <select id="projectMembers" resultType="map">
+        select user_id,user_name, r.role_name,r.role_position,u.join_time
+        from t_user u,t_role r
+        where u.project_id=#{project_id} and u.role_id=r.role_id and r.role_position in('3','4')
+        union 
+        select project_area_admin_id as user_id, u.user_name, '区域管理员' as role_name, '1' as role_position, p.area_admin_join_time join_time
+        from t_project p,t_user u 
+        where p.project_id=#{project_id} and p.project_area_admin_id=u.user_id
+        union 
+        select project_admin_id as user_id, u.user_name, '项目管理员', '2', p.project_admin_join_time join_time
+        from t_project p,t_user u 
+        where p.project_id=#{project_id} and p.project_admin_id=u.user_id
+        order by role_position
+    </select>
+      
+    <select id="projectUsers" resultType="map">
+        select user_id,u.user_name,u.role_id,u.avatarObjectName,  r.role_name,r.role_position
+        from t_user u,t_role r 
+        where project_id=#{project_id} and u.role_id=r.role_id
+    </select>      
+    
+    <select id="nonProjectUsers" resultType="map">
+        select user_id,user_name,u.role_id,r.role_name,r.role_position
+        from t_user u
+          join t_role r on u.role_id=r.role_id 
+          left join t_project p on u.project_id=p.project_id
+        where ( ( u.project_id='' or u.project_id is null or p.project_id is null) or (u.project_id is not null and u.project_id <![CDATA[<>]]> '' and p.project_status='2'))  
+          and r.role_position in('3','4')  
+    </select>    
+    
+    <update id="clearProjectAdmin">
+        update t_project 
+        set project_admin_id = null 
+        where project_admin_id = #{project_admin_id} and project_id <![CDATA[<>]]> #{project_id} and project_status <![CDATA[<>]]> '2'
+    </update>
+
+    <!-- SysRole -->
+    <insert id="addSysRole" parameterType="map">
+        insert into sys_role(role_id,role_name,role_desc,role_authories)
+        values (
+            #{role_id,    jdbcType=VARCHAR}, 
+            #{role_name,  jdbcType=VARCHAR},
+            #{role_desc,  jdbcType=VARCHAR},
+            #{role_authories,  jdbcType=VARCHAR}
+        )
+    </insert>
+    <select id="getSysRole" resultType="map">
+        select * from sys_role where role_id = #{role_id}
+    </select>    
+    <update id="updSysRole" parameterType="map">
+        update sys_role set 
+          role_name = #{role_name}, 
+          role_desc = #{role_desc},
+          role_authories = #{role_authories}
+        where role_id = #{role_id}
+    </update>
+    <update id="delSysRole">
+        delete from sys_role
+        where role_id = #{role_id}
+    </update>
+        
+    <sql id="sqlFindSysRolePage">
+        select * from sys_role order by create_time desc
+    </sql>
+    <select id="findSysRolePage" parameterType="map" resultType="map">
+        <include refid="sqlFindSysRolePage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findSysRolePageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindSysRolePage"/>) a
+    </select>    
+    
+    <!-- SysUser -->
+    <insert id="addSysUser" parameterType="map">
+        insert into sys_user(user_id,login_name,login_pwd,user_name,role_id,remark)
+        values (
+            #{user_id,    jdbcType=VARCHAR}, 
+            #{login_name,    jdbcType=VARCHAR}, 
+            #{login_pwd,  jdbcType=VARCHAR},
+            #{user_name,  jdbcType=VARCHAR},
+            #{role_id,  jdbcType=VARCHAR},
+            #{remark,  jdbcType=VARCHAR}
+        )
+    </insert>
+    <select id="getSysUser" resultType="map">
+        select * from sys_user where user_id = #{user_id} 
+    </select>    
+    <update id="updSysUser" parameterType="map">
+        update sys_user set 
+          login_pwd = #{login_pwd}, 
+          user_name = #{user_name},
+          role_id = #{role_id},
+          remark = #{remark}
+        where user_id = #{user_id}
+    </update>
+    <update id="delSysUser">
+        delete from sys_user
+        where user_id = #{user_id}
+    </update>
+    <select id="findSysUserCount" resultType="int">
+        select count(1) from sys_user where login_name = #{login_name} and login_pwd = #{login_pwd} and user_status='1'
+    </select>
+    <select id="findSysUserAuthories" resultType="java.lang.String">
+        select role_authories from sys_role r, sys_user u
+        where u.login_name=#{login_name}  and r.role_id = u.role_id
+    </select>
+    <update id="setSysUserStatus">
+        update sys_user set user_status=#{user_status}
+        where user_id = #{user_id}
+    </update> 
+    
+    <select id="getSysUserIdByLoginName" resultType="string">
+        select user_id from sys_user where login_name = #{login_name}
+    </select>       
+    
+    <sql id="sqlFindSysUserPage">
+        select user_id,login_name,login_pwd,user_name,u.role_id,remark,user_status,r.role_name
+        from sys_user u, sys_role r
+        where u.role_id=r.role_id
+        order by u.create_time desc
+    </sql>
+    <select id="findSysUserPage" parameterType="map" resultType="map">
+        <include refid="sqlFindSysUserPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findSysUserPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindSysUserPage"/>) a
+    </select>
+    
+    <select id="getSysUserCountByRoleId" resultType="int">
+        select count(1) RecordCount from sys_user where role_id = #{arg0}
+    </select>
+
+    <!-- Dict -->
+    <insert id="addDict" parameterType="map">
+        insert into t_dict(dict_id,dict_name,dict_desc,dict_type)
+        values (
+            #{dict_id,    jdbcType=VARCHAR}, 
+            #{dict_name,  jdbcType=VARCHAR},
+            #{dict_desc,  jdbcType=VARCHAR},
+            #{dict_type,  jdbcType=VARCHAR}
+        )
+    </insert>
+    <select id="getDict" resultType="map">
+        select * from t_dict where dict_id = #{dict_id}
+    </select>
+    <update id="updDict" parameterType="map">
+        update t_dict set 
+          dict_name = #{dict_name}, 
+          dict_desc = #{dict_desc}, 
+          update_time = CURRENT_TIMESTAMP() 
+        where dict_id = #{dict_id}
+    </update>
+    <update id="delDict">
+        delete from t_dict
+        where dict_id = #{dict_id}
+    </update>
+    <select id="getHintValidHour" resultType="string">
+        select dict_name from t_dict where dict_type = '90'
+    </select>
+            
+    <sql id="sqlFindDictPage">
+        select * from t_dict
+        where dict_type = #{dict_type}
+        order by create_time desc
+    </sql>
+    <select id="findDictPage" parameterType="map" resultType="map">
+        <include refid="sqlFindDictPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findDictPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindDictPage"/>) a
+    </select>
+    
+    <select id="findDicts" resultType="map" >
+        select dict_id,dict_name,dict_type from t_dict
+    </select>
+    
+    <!-- Check Dict -->
+    <select id="getDictCustomerTypeRefCount" resultType="int" >
+        select count(1) recordCount from t_hint where customer_type_ids like '%${dict_id}%'
+    </select>
+    <select id="getItemTypeRefCount" resultType="int" >
+        select count(1) recordCount from t_hint where item_type_id = #{arg0}
+    </select>
+    <select id="getHintTypeRefCount" resultType="int" >
+        select count(1) recordCount from t_hint where hint_type_id = #{arg0}
+    </select>
+    
+    <select id="getHintLevelRefCount" resultType="int" >
+        select count(1) recordCount from t_hint where hint_level_id = #{arg0}
+    </select>
+    <select id="getHintLevelRoleRefCount" resultType="int" >
+        select count(1) recordCount from t_role where hint_level = #{arg0}
+    </select>
+                
+    <!-- Hint -->
+    <insert id="addHint" parameterType="map">
+        insert into t_hint (hint_id,hint_name,remark,project_id,  
+           hint_type_id,hint_level_id,item_type_id,customer_type_ids,
+           corp_name,corp_address,province,city,district,  
+           customer_name,customer_contact,  
+           hint_from,audit_status,create_by
+        )
+        values (
+            #{hint_id,       jdbcType=VARCHAR}, 
+            #{hint_name,     jdbcType=VARCHAR},
+            #{remark,        jdbcType=VARCHAR},
+            #{project_id,    jdbcType=VARCHAR}, 
+            
+            #{hint_type_id,       jdbcType=VARCHAR},
+            #{hint_level_id,      jdbcType=VARCHAR},
+            #{item_type_id,       jdbcType=VARCHAR},
+            #{customer_type_ids,  jdbcType=VARCHAR},
+            
+            #{corp_name,          jdbcType=VARCHAR}, 
+            #{corp_address,       jdbcType=VARCHAR},
+            #{province,           jdbcType=VARCHAR},
+            #{city,               jdbcType=VARCHAR},
+            #{district,           jdbcType=VARCHAR},
+            
+            #{customer_name,      jdbcType=VARCHAR},
+            #{customer_contact,   jdbcType=VARCHAR},
+            
+            #{hint_from,     jdbcType=VARCHAR},
+            #{audit_status,  jdbcType=VARCHAR},
+            #{create_by,     jdbcType=VARCHAR}
+        )
+    </insert>
+    <select id="getHint" resultType="map">
+        select * from t_hint where hint_id = #{hint_id}
+    </select>
+    <update id="assignHint">
+        update t_hint set 
+            user_id= #{user_id},
+            ask_assign_time = CURRENT_TIMESTAMP(),
+            valid_starttime = CURRENT_TIMESTAMP(),
+            valid_endtime = date_add(now(), interval 30 day),
+            hint_status = '1'            
+        where hint_id = #{hint_id}
+    </update>
+    <update id="auditHint" parameterType="map">
+        update t_hint set 
+            audit_status= #{audit_status},
+            audit_result = #{audit_result},
+            audit_time = CURRENT_TIMESTAMP() 
+        where hint_id = #{hint_id}
+    </update>    
+    <update id="delHint">
+        delete from t_hint
+        where hint_id = #{hint_id}
+    </update>    
+    <update id="updHint" parameterType="map">
+        update t_hint set 
+          hint_name = #{hint_name}, 
+          remark = #{remark}, 
+          project_id = #{project_id},
+          
+          corp_name = #{corp_name}, 
+          corp_address = #{corp_address},
+          province = #{province}, 
+          city = #{city},
+          district = #{district}, 
+          
+          hint_type_id = #{hint_type_id},
+          hint_level_id = #{hint_level_id}, 
+          item_type_id = #{item_type_id}, 
+          customer_type_ids = #{customer_type_ids},
+          
+          customer_name = #{customer_name},
+          customer_contact = #{customer_contact}, 
+          
+        <if test="valid_starttime!=null">
+            valid_starttime = #{valid_starttime},
+        </if>
+        <if test="valid_endtime!=null">
+            valid_endtime = #{valid_endtime},
+        </if>                 
+          
+          user_id = #{user_id},
+          
+          update_time = CURRENT_TIMESTAMP() 
+        where hint_id = #{hint_id}
+    </update>
+    
+    <sql id="sqlFindHintPage">
+        select h.*, p.project_name, item.dict_name as item_type_name,level.dict_name as hint_level_name,u.user_name
+        from t_hint h
+          inner join t_project p on h.project_id=p.project_id
+          left join (select * from t_dict where dict_type='02') item on h.item_type_id = item.dict_id
+          left join (select * from t_dict where dict_type='04') level on h.hint_level_id= level.dict_id
+          left join t_user u on h.user_id=u.user_id
+        where 1=1
+        <if test="project_name!=null and project_name!=''">
+            and p.project_name like '%${project_name}%'
+        </if>
+        <if test="item_type_name!=null and item_type_name!=''">
+            and item.dict_name like '%${item_type_name}%'
+        </if>
+        <if test="corp_name!=null and corp_name!=''">
+            and h.corp_name like '%${corp_name}%'
+        </if>
+        <if test="customer_name!=null and customer_name!=''">
+            and h.customer_name like '%${customer_name}%'
+        </if>
+        <if test='ask_status == "1"'>
+            and h.user_id is not null and h.user_id <![CDATA[<>]]> ''
+        </if>
+        <if test='ask_status == "0"'>
+            and (h.user_id is null or h.user_id = '')
+        </if>
+        order by h.create_time desc
+    </sql>
+    <select id="findHintPage" parameterType="map" resultType="map">
+        <include refid="sqlFindHintPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findHintPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindHintPage"/>) a
+    </select>
+    
+    
+    <sql id="sqlFindHintRecordPage">
+        select h.hint_name,h.corp_name,h.customer_name,h.remark, p.project_name,u.user_name, r.record_content,r.create_time
+        from t_hint_record r, t_hint h, t_user u, t_project p
+        where r.hint_id=h.hint_id and r.user_id=u.user_id and h.project_id=p.project_id          
+        <if test="startTime!=null and startTime!='' and endTime!=null and endTime!=''">
+            and r.create_time BETWEEN str_to_date(#{startTime}, '%Y-%m-%d %H:%i:%s') and str_to_date(#{endTime}, '%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="projectName!=null and projectName!=''">
+            and p.project_name like '%${projectName}%'
+        </if>        
+        <if test="hintName!=null and hintName!=''">
+            and hint_name like '%${hintName}%'
+        </if>
+        <if test="corpName!=null and corpName!=''">
+            and corp_name like '%${corpName}%'
+        </if>
+        <if test="userName!=null and userName!=''">
+            and u.user_name like '%${userName}%'
+        </if>
+        <if test="customerName!=null and customerName!=''">
+            and customer_name like '%${customerName}%'
+        </if>
+        order by r.create_time desc
+    </sql>
+    <select id="findHintRecordPage" parameterType="map" resultType="map">
+        <include refid="sqlFindHintRecordPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findHintRecordPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindHintRecordPage"/>) a
+    </select>   
+    
+    <select id="getHintImages" resultType="string">
+        select img_objname from t_hint_image where hint_id = #{hint_id}
+    </select>
+    <insert id="addHintImg" parameterType="map">
+        insert into t_hint_image(hint_image_id,hint_id,img_objname)
+        values (
+            #{hint_image_id,    jdbcType=VARCHAR}, 
+            #{hint_id,          jdbcType=VARCHAR},
+            #{img_objname,      jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="delHintImg">
+        delete from t_hint_image
+        where hint_id = #{hint_id}
+    </update>
+    
+    <!-- User Management -->
+    <sql id="sqlFindUserPage">
+        select u.user_id,u.user_name,u.tel,u.avatarObjectName,u.invite_code,u.create_time,u.project_id,u.user_status,  r.role_name,r.role_position,           
+          p.project_admin_id, projUser.user_name project_admin_username,  
+                    p.project_area_admin_id, areaUser.user_name area_admin_username,
+                    IFNULL(A.CurrAskedCount,0) CurrAskedCount, IFNULL(B.TotalAskedCount, 0) TotalAskedCount, IFNULL(C.TotalAddedCount, 0) TotalAddedCount
+        from t_user u 
+          inner join t_role r on u.role_id=r.role_id
+          left join (select user_id,project_id, count(1) CurrAskedCount from t_hint h where user_id is not null GROUP BY user_id,project_id) A on u.user_id=A.user_id and u.project_id=A.project_id
+          left join (select user_id, count(1) TotalAskedCount from t_hint where user_id is not null group by user_id) B on u.user_id=B.user_id
+          left join (select create_by, count(1) TotalAddedCount from t_hint where create_by is not null group by create_by) C on u.user_id=C.create_by
+          left join t_project p on u.project_id=p.project_id
+          left join t_user projUser on p.project_admin_id=projUser.user_id
+          left join t_user areaUser on p.project_area_admin_id=areaUser.user_id
+        where 1=1  
+          <if test="role_name!=null and role_name!=''">
+              and r.role_name like '%${role_name}%'
+          </if>        
+          <if test="tel!=null and tel!=''">
+              and u.tel like '%${tel}%' 
+          </if> 
+          <if test="user_name!=null and user_name!=''">
+              and u.user_name like '%${user_name}%'
+          </if>
+          
+          <if test="invite_code!=null and invite_code!=''">
+              and u.invite_code like '%${invite_code}%'
+          </if>
+          <if test="role_name!=null and role_name!=''">
+              and r.role_name like '%${role_name}%'
+          </if>                    
+          order by u.create_time desc
+    </sql>
+    <select id="findUserPage" parameterType="map" resultType="map">
+        <include refid="sqlFindUserPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findUserPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindUserPage"/>) a
+    </select>
+
+    <update id="setUserStatus">
+        update t_user 
+        set user_status=#{user_status}
+        where user_id=#{user_id}
+    </update>  
+    
+    <!-- App Manager -->
+    <select id="findProjectsByAppMgr" resultType="map">
+        select p.project_id,p.project_name projectName,p.create_time createTime, u.user_name projectAdminName, 
+          IFNULL(A.saleCount,0) saleCount,IFNULL(B.spreaderCount,0) spreaderCount, IFNULL(C.hintCount,0) hintCount
+        from t_project p 
+            left join t_user u on p.project_admin_id=u.user_id
+            left join (SELECT u.project_id,r.role_position, count(1) saleCount from t_user u,t_role r 
+                     where u.role_id=r.role_id and r.role_position=3 group by u.project_id,r.role_position) A on p.project_id=A.project_id
+            left join (SELECT u.project_id,r.role_position, count(1) spreaderCount from t_user u,t_role r 
+                     where u.role_id=r.role_id and r.role_position=4 group by u.project_id,r.role_position) B on p.project_id=B.project_id
+            left join (select project_id,count(1) hintCount from t_hint group by project_id) C on p.project_id=C.project_id
+        where 1=1
+        <if test="project_area_admin_id!=null and project_area_admin_id!=''">
+            and p.project_area_admin_id = #{project_area_admin_id}
+        </if>
+        <if test="project_admin_id!=null and project_admin_id!=''">
+            and p.project_admin_id = #{project_admin_id}
+        </if>
+        <if test="project_name!=null and project_name!=''">
+            and p.project_name like '%${project_name}%'
+        </if>
+    </select>
+    
+    <select id="findRunningProjects" resultType="map">
+        select p.project_id,p.project_name projectName,p.create_time createTime,p.project_status
+        from t_project p 
+        where project_status = '1'
+    </select>    
+     
+    <sql id="sqlFindAppMgrHintPage">
+        select h.hint_id,IFNULL(h.user_id,'') user_id, h.hint_name,p.project_id, p.project_name,p.project_status, D.dict_name item_type_name, h.customer_name,h.update_time,h.hint_status
+        from t_hint h 
+             join t_project p on h.project_id = p.project_id 
+             left join (select dict_id,dict_name from t_dict where dict_type='02') D on h.item_type_id=D.dict_id
+        where 1=1
+        <if test="project_admin_id!=null and project_admin_id!=''">
+            and p.project_admin_id = #{project_admin_id}
+        </if>
+        <if test="project_area_admin_id!=null and project_area_admin_id!=''">
+            and p.project_area_admin_id = #{project_area_admin_id}
+        </if>
+        <if test="project_id!=null and project_id!=''">
+            and p.project_id = #{project_id}
+        </if>
+        <if test="project_name!=null and project_name!=''">
+            and p.project_name like '%${project_name}%'
+        </if>        
+        <if test='hintStatus == "1"'>
+            and h.user_id is not null and h.user_id <![CDATA[<>]]> ''
+        </if>
+        <if test='hintStatus == "0"'>
+            and (h.user_id is null or h.user_id = '')
+        </if>        
+        order by h.create_time desc
+    </sql>
+    <select id="findAppMgrHintPage" resultType="map">
+        <include refid="sqlFindAppMgrHintPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findAppMgrHintPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindAppMgrHintPage"/>) a
+    </select>     
+
+
+    <!-- APP/Mgr/AskedHints -->
+    <sql id="sqlFindHintsByAskedUserPage">
+        select hint_id,hint_name,item_type_id,h.project_id,h.update_time,customer_name,hint_status, I.dict_name item_type_name, p.project_name,h.user_id,h.ask_assign_time ask_time
+        from t_hint h
+           inner join t_project p on h.project_id=p.project_id
+           inner join t_user u on h.user_id=u.user_id
+           left join t_dict I on h.item_type_id=I.dict_id and I.dict_type='02' 
+        where 1=1
+        <if test="user_name!=null and user_name!=''">
+           and u.user_name like '%${user_name}%'
+        </if>
+        <if test="user_id!=null and user_id!=''">
+           and h.user_id = #{user_id}
+        </if>        
+    </sql>
+    <select id="findHintsByAskedUserPage" parameterType="map" resultType="map">
+        <include refid="sqlFindHintsByAskedUserPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findHintsByAskedUserPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindHintsByAskedUserPage"/>) a
+    </select>
+    
+    <!-- Get ProjectId -->
+    <select id="getProjectIdsByProjectAdmin" resultType="string">
+        select project_id from t_project where project_admin_id=#{user_id}
+    </select>
+    <select id="getProjectIdsByAreaAdmin" resultType="string">
+        select project_id from t_project where project_area_admin_id=#{user_id}
+    </select>    
+    
+    <!-- App/Mgr/AddedHints -->
+    <sql id="sqlFindHintsByAddedUserPage">
+        select hint_id,hint_name,item_type_id,h.project_id,h.update_time,customer_name,hint_status, I.dict_name item_type_name, p.project_name,
+           h.user_id,h.ask_assign_time ask_time, h.create_time
+        from t_hint h
+           inner join t_project p on h.project_id=p.project_id
+           inner join t_user u on h.create_by=u.user_id
+           left join t_dict I on h.item_type_id=I.dict_id and I.dict_type='02' 
+        where 1=1
+        <if test="user_name!=null and user_name!=''">
+           and u.user_name like '%${user_name}%'
+        </if>
+        <if test="user_id!=null and user_id!=''">
+           and h.create_by = #{user_id}
+        </if>        
+    </sql>
+    <select id="findHintsByAddedUserPage" parameterType="map" resultType="map">
+        <include refid="sqlFindHintsByAddedUserPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findHintsByAddedUserPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindHintsByAddedUserPage"/>) a
+    </select>
+    
+    <select id="getHintDetail" resultType="map">
+        select hint_id,hint_name,h.remark,h.hint_level_id,h.update_time,h.corp_name, customer_name,customer_contact, h.hint_status,h.audit_status,
+                     h.user_id, asker.user_name ask_user_name,  asker.user_id ask_user_id,
+                     h.create_by, creater.user_name create_by_name,
+                     h.corp_address,h.province,h.city,h.district,
+           h.project_id, p.project_name, p.project_status, 
+           h.hint_type_id, A.dict_name hint_type_name,
+           h.item_type_id, I.dict_name item_type_name,    
+           h.valid_starttime,h.valid_endtime, 
+           customer_type_ids
+        from t_hint h
+           inner join t_project p on h.project_id=p.project_id
+           left join t_user creater on h.create_by=creater.user_id
+           left join t_user asker on h.user_id = asker.user_id
+           left join t_dict I on h.item_type_id=I.dict_id and I.dict_type='02' 
+           left join t_dict A on h.hint_type_id=A.dict_id and A.dict_type='03' 
+        where hint_id = #{hint_id} 
+    </select>  
+    
+    <select id="getCustomerTypes" resultType="map">
+        select dict_id,dict_name from t_dict where dict_type='01'
+    </select>
+    
+    <select id="theHintRecords" resultType="map">
+        select hr.*,u.user_name from t_hint_record hr,t_user u 
+        where hr.user_id=u.user_id and hint_id=#{hint_id}
+        order by create_time desc
+    </select>
+    
+    <select id="findUsers" resultType="map">
+        select user_id, user_name, avatarObjectName,project_id, r.role_position 
+        from t_user u, t_role r
+        where u.role_id=r.role_id and r.role_position in('3','4') and project_id=#{project_id}
+    </select>      
+
+    <!-- App/Mgr/Member List Begin -->
+    <sql id="sqlFindNormalUsersByProjectAdminPage">
+        select u.user_id,user_name,u.avatarObjectName, r.role_name, tel,project_id,r.role_position,IFNULL(A.AddedCount,0) AddedCount, IFNULL(B.RecordedCount,0) RecordedCount
+        from t_user u  
+          inner join t_role r on u.role_id=r.role_id
+          left join (select create_by, count(1) AddedCount from t_hint where project_id in (${project_ids}) and create_by is not null group by create_by) A on u.user_id=A.create_by
+          left join (select user_id, count(distinct hint_id) RecordedCount from t_hint_record where project_id in (${project_ids}) group by user_id) B on u.user_id=B.user_id
+        where project_id in (${project_ids}) and r.role_position=#{role_position}
+        ${order_column}
+    </sql>
+    <select id="findNormalUsersByProjectAdminPage" parameterType="map" resultType="map">
+        <include refid="sqlFindNormalUsersByProjectAdminPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findNormalUsersByProjectAdminPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindNormalUsersByProjectAdminPage"/>) a
+    </select>     
+    
+    <sql id="sqlFindProjectAdminUsersByAreaAdminPage">
+         select user_id,u.user_name, avatarObjectName,tel,r.role_name, A.*
+         from t_user u, t_role r,
+            ( select project_admin_id, count(1) projectCount from t_project where project_id in (${project_ids}) group by project_admin_id) A
+         where u.role_id=r.role_id and u.user_id=A.project_admin_id 
+    </sql>
+    <select id="findProjectAdminUsersByAreaAdminPage" parameterType="map" resultType="map">
+        <include refid="sqlFindProjectAdminUsersByAreaAdminPage"/>
+        limit #{startIndex}, #{pageSize}    
+    </select>
+    <select id="findProjectAdminUsersByAreaAdminPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlFindProjectAdminUsersByAreaAdminPage"/>) a
+    </select>
+    <!-- App/Mgr/Member List End --> 
+    
+    <!-- 区域经理的 总项目数，总项目经理人数 -->
+    <select id="findProjectAdminCountAndProjectCount" resultType="map">
+        select
+        (select count(1) projectCount 
+         from t_project p, (select project_area_admin_id from t_project where project_id=#{project_id})A
+         where p.project_area_admin_id = A.project_area_admin_id
+        ) projectCount, 
+        (select count(distinct project_admin_id) projectAdminCount
+         from t_project p, (select project_area_admin_id from t_project where project_id=#{project_id}) B
+         where p.project_area_admin_id=B.project_area_admin_id) projectAdminCount    
+    </select>
+
+    <!-- Project Admin Details:  projectAminDetail -->
+    <select id="projectAdminDetail" resultType="map">
+        select p.project_id,project_name,p.create_time, 
+          IFNULL(A.saler_count,0) saler_count, IFNULL(B.spreader_count, 0) spreader_count, IFNULL(C.hintCount,0) hintCount
+        from t_project p 
+          left join ( select u.project_id, count(1) saler_count from t_user u, t_role r
+                      where u.role_id=r.role_id and r.role_position='3' group by u.project_id ) A on p.project_id=A.project_id
+          left join ( select u.project_id, count(1) spreader_count from t_user u, t_role r
+                      where u.role_id=r.role_id and r.role_position='4' group by u.project_id ) B on p.project_id=B.project_id
+          left join (select project_id, count(1) hintCount from t_hint group by project_id) C on p.project_id = C.project_id
+        where project_admin_id=#{project_admin_id}
+    </select>
+    
+    <!-- Users Added Hint -->
+    <select id="userAskedHints" resultType="map">
+        select h.hint_id,h.project_id,p.project_name,A.dict_name ItemName, h.ask_assign_time asked_time
+        from t_hint h,t_user u, t_project p, (SELECT dict_id, dict_name from t_dict where dict_type='02') A
+        where u.user_id=#{user_id} 
+          and h.user_id=u.user_id 
+          and h.project_id=u.project_id
+          and h.project_id=p.project_id
+          and h.item_type_id=A.dict_id    
+    </select>
+    
+    <select id="userAddedHints" resultType="map">
+        select h.hint_name,h.customer_name,h.create_by, h.create_time, A.dict_name ItemName,p.project_name 
+        from t_hint h, t_user u, t_project p,
+          (SELECT dict_id, dict_name from t_dict where dict_type='02') A
+        where u.user_id=#{user_id}
+          and h.create_by=u.user_id 
+          and h.project_id=u.project_id
+          and h.project_id=p.project_id 
+          and h.item_type_id=A.dict_id
+    </select>
+    
+    <!-- Personal Center  Begin -->
+    <!-- Project Admin -->
+    <select id="getProjectAdminProjectCount" resultType="int">
+        select count(1) projectCount from t_project where project_admin_id=#{user_id}
+    </select>
+    <select id="getProjectAdminMemberCount" resultType="map">
+        select r.role_position, count(1) userCount
+        from t_user u, t_role r, t_project p
+        where r.role_position in('3','4') and p.project_admin_id=#{user_id}
+          and u.role_id = r.role_id 
+          and u.project_id=p.project_id
+        group by r.role_position    
+    </select>
+    
+    <!-- Area Admin -->
+    <select id="getAreaAdminProjectCount" resultType="int">
+        select count(1) projectCount from t_project where project_area_admin_id=#{user_id}
+    </select>
+    <select id="getAreaAdminMemberCount" resultType="map">
+        select r.role_position, count(1) userCount
+        from t_user u, t_role r, t_project p
+        where r.role_position in('3','4') and p.project_area_admin_id=#{user_id}
+          and u.role_id = r.role_id 
+          and u.project_id=p.project_id
+        group by r.role_position    
+    </select>
+    
+    <select id="getProjectAdminCountOfAreaAdmin" resultType="int">
+        select count(distinct project_admin_id) projectAdminCount from t_project where project_area_admin_id=#{user_id}
+    </select>    
+    <!-- Personal Center END -->
+    
+    
+    <!-- App/User -->
+    <!-- Public Hint Pool -->
+    <sql id="sqlfindPublicHintsPage">
+        select h.*, u.role_id,r.hint_level,item.dict_name item_type_name,p.project_name,p.project_status
+        from t_hint h
+            inner join t_user u on h.project_id=u.project_id
+            inner join t_role r on u.role_id=r.role_id
+            inner join t_project p on h.project_id=p.project_id
+          left join (select * from t_dict where dict_type='02') item on h.item_type_id = item.dict_id
+        where u.user_id=#{user_id} 
+          and h.hint_level_id=r.hint_level  
+          and (h.user_id is null or h.user_id='') 
+        <if test="item_type_name!=null and item_type_name!=''">
+            and item.dict_name like '%${item_type_name}%'
+        </if>
+        order by h.create_time desc           
+    </sql>    
+    <select id="findPublicHintsPage" parameterType="map" resultType="map">
+        <include refid="sqlfindPublicHintsPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="findPublicHintsPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlfindPublicHintsPage"/>) a
+    </select>
+    
+    <update id="askHint">
+        update t_hint 
+        set user_id=#{user_id}, hint_status='1',ask_assign_time=CURRENT_TIMESTAMP(), 
+            valid_starttime=#{valid_starttime}, valid_endtime=#{valid_endtime}
+        where hint_id=#{hint_id}
+    </update>   
+    
+    <update id="freeHint">
+        update t_hint 
+        set user_id=null, hint_status='0', ask_assign_time=null, valid_starttime=null, valid_endtime=null
+        where hint_id=#{hint_id}
+    </update>  
+    
+    <update id="autoFreeHint">
+        update t_hint set user_id=null, ask_assign_time=null, valid_starttime=null, valid_endtime=null, hint_status='0' where valid_endtime <![CDATA[<]]> now()    
+    </update>  
+
+    <!-- My Hints -->
+    <sql id="sqlmyHintsPage">
+        select h.*,item.dict_name item_type_name, p.project_status
+        from t_hint h
+            inner join t_project p on h.project_id=p.project_id
+            left join (select * from t_dict where dict_type='02') item on h.item_type_id = item.dict_id
+        where 1=1 
+        <if test="item_type_name!=null and item_type_name!=''">
+            and item.dict_name like '%${item_type_name}%'
+        </if>      
+        <if test="my_hint_type=='ADD'">
+            and h.create_by=#{user_id}
+            order by h.create_time desc
+        </if>
+        <if test="my_hint_type=='ASK'">
+            and h.user_id=#{user_id}
+            order by h.ask_assign_time desc
+        </if>        
+                   
+    </sql>
+    <select id="myHintsPage" parameterType="map" resultType="map">
+        <include refid="sqlmyHintsPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="myHintsPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlmyHintsPage"/>) a
+    </select>     
+
+    <update id="updHintRemark">
+        update t_hint set remark = #{remark} where hint_id=#{hint_id}
+    </update>
+    
+    <insert id="addHintRecord" parameterType="map">
+        insert into t_hint_record(hint_record_id, hint_id, record_content, user_id, project_id)
+        values (
+            #{hint_record_id,   jdbcType=VARCHAR}, 
+            #{hint_id,          jdbcType=VARCHAR},
+            #{record_content,   jdbcType=VARCHAR},
+            #{user_id,          jdbcType=VARCHAR},
+            #{project_id,       jdbcType=VARCHAR}
+        )
+    </insert>
+    
+    <select id="getAddedHintsCount" resultType="int">
+        select count(hint_id) addedHintsCount from t_hint where create_by=#{user_id}
+    </select>
+    <select id="getTracedHintsCount" resultType="int">
+        select count(distinct hint_id) tracedHintsCount from t_hint_record where user_id=#{user_id}
+    </select>
+    
+    <!-- Added Hint Ranking -->
+    <sql id="sqlgetAddedHintsCountPageRank">
+        select A.*,u.user_name, u.avatarObjectName
+        FROM (select create_by user_id, count(hint_id) addedHintsCount 
+              from t_hint 
+              where create_by is not null and project_id=#{project_id}
+              group by create_by) A, t_user u, t_role r
+        where A.user_id = u.user_id and u.role_id=r.role_id and r.role_position in ('3','4')
+        
+        UNION
+        
+        select user_id, '0' addedHintsCount, user_name,avatarObjectName 
+        from t_user u, t_role r
+        where project_id=#{project_id}
+          and u.role_id=r.role_id and r.role_position in ('3','4')
+          and user_id not in (select distinct create_by from t_hint where project_id=#{project_id} and create_by is not null )
+        
+        order by addedHintsCount desc
+    </sql>
+    <select id="getAddedHintsCountRankPage" parameterType="map" resultType="map">
+        <include refid="sqlgetAddedHintsCountPageRank"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="getAddedHintsCountRankPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlgetAddedHintsCountPageRank"/>) a
+    </select>
+    
+    <!-- Traced Hint Ranking -->
+    <sql id="sqlgetTraceedHintsCountRankPage">
+        select A.*,u.user_name, u.avatarObjectName
+              FROM (
+                    select user_id, count(distinct hint_id) tracedHintsCount 
+                    from t_hint_record
+                    where project_id = #{project_id}
+                    group by user_id) A, t_user u
+                where A.user_id = u.user_id
+                
+                UNION
+                select user_id, '0' tracedHintsCount, user_name,avatarObjectName 
+                from t_user u, t_role r  
+                where project_id=#{project_id}
+                  and u.role_id=r.role_id
+                  and r.role_position in ('3','4')
+                  and user_id not in (select distinct user_id from t_hint_record where project_id=#{project_id} and user_id is not null )
+                
+        order by tracedHintsCount desc
+    </sql>
+    <select id="getTracedHintsCountRankPage" parameterType="map" resultType="map">
+        <include refid="sqlgetTraceedHintsCountRankPage"/>
+        limit #{startIndex}, #{pageSize}
+    </select>
+    <select id="getTracedHintsCountRankPageCount" parameterType="map" resultType="int" >
+        select count(1) recordCount from (<include refid="sqlgetTraceedHintsCountRankPage"/>) a
+    </select>
+    
+    
+    <!-- Statics -->
+    <select id="staticsTotalCount" resultType="map" >
+        select (select count(1) projectCount from t_project) totalProjectCount, 
+          (select count(1) hintCount from t_hint) totalHintCount,
+          (select count(distinct hint_id) from t_hint_record) totalTraceHintCount,
+          (select count(1) userCount from t_user) totalUserCount
+    </select>
+    <select id="staticsTotalSaleBuildCount" resultType="map" >
+        select role_position, count(1) userCount from t_user u, t_role r 
+        where u.role_id=r.role_id and r.role_position in('3','4')
+        group by role_position
+    </select>
+    
+    <!-- Hint, trace -->
+    <select id="staticsAskHintCount" resultType="map" >
+        select date_format(ask_assign_time,'%m.%d') YearMonth, count(1) askHintCount
+        from t_hint
+        where ask_assign_time BETWEEN str_to_date(#{date1},'%Y-%m-%d') and str_to_date(#{date2},'%Y-%m-%d')
+        group by YearMonth
+    </select>
+    <select id="staticsTraceHintCount" resultType="map" >
+        select date_format(create_time,'%m.%d') YearMonth, count(distinct hint_id) traceHintCount 
+        from t_hint_record
+        where create_time BETWEEN str_to_date(#{date1},'%Y-%m-%d') and str_to_date(#{date2},'%Y-%m-%d')
+        group by YearMonth
+    </select>
+    
+    <!-- Statics User -->
+    <select id="staticsUserCount" resultType="map" >
+        select date_format(create_time,'%m.%d') YearMonth, count(1) count
+        from t_user
+        where create_time BETWEEN str_to_date(#{date1},'%Y-%m-%d') and str_to_date(#{date2},'%Y-%m-%d')
+        group by YearMonth
+    </select>    
+    <!-- Statics Sales and Extensions -->
+    <select id="staticsSalesBuildCount" resultType="map" >
+        select date_format(u.create_time,'%m.%d') YearMonth, r.role_position, count(1) count
+        from t_user u,t_role r
+        where u.role_id=r.role_id and r.role_position in('3','4')
+          and u.create_time BETWEEN str_to_date(#{date1},'%Y-%m-%d') and str_to_date(#{date2},'%Y-%m-%d')
+        group by YearMonth, role_position   
+    </select>      
+
+
+    <update id="updateProjectTime">
+        update t_project set update_time =#{update_time} where project_id='144f807280c34ad290493591a5cae4cb'
+    </update> 
+</mapper>

@@ -1,0 +1,140 @@
+Enum
+------
+邀请码状态  0-未使用 1-已使用 2-已废弃
+角色身份   1-区域管理员 2-项目管理员 3-销售 4-拓客员
+审核状态 audit_status  0-审核中 1-已通过 2-未通过
+线索来源 hint_from     1-管理员创建 2-员工创建 3-导入
+认领状态 hint_status   0-未认领 1-已认领
+项目状态   1-进行中 2-已归档
+用户状态   0-禁用 1-启用
+
+Dictionary(01=客户类别 02=项目类别 03=线索类别 04=线索等级)
+------
+090e4d483b8a496cb4980e3cb6e7b79d	开发部	Dev Dept	2021-11-08 21:05:33	01
+8869a155863b418a9f186e6581d14363	运营部	运营部	2021-11-08 20:50:32	01
+baa094e0e5074822af76deb6ed447e6f	市场部	市场部	2021-11-08 20:50:32	01
+d38659a5453a45939ba8f3351420aa56	销售部	销售部	2021-11-08 20:50:32	01
+e49856fbd63042178619a3e7cd58b0c1	经理部	经理部	2021-11-08 21:05:33	01
+
+5c3595e09acc447ea8d30c3729990308	银行	银行 desc	2021-11-08 22:54:19	02
+7e99329fc15a427da11502661d636724	餐饮	餐饮 desc	2021-11-08 22:54:19	02
+bdfaa627dd26472198cdca578f4fbd92	银行超市	超市 desc	2021-11-08 22:54:19	02
+
+241a8357372547c5a125a14e2bb22691	科技企业	科技企业  desc	2021-11-08 22:54:19	03
+b4a13f6fc3a94fe28af89087eb2803b2	传统企业	传统企业  desc	2021-11-08 22:54:19	03
+c7b11a21bf6048618f16e59c486df7c0	机器人企业	机器人企业 desc	2021-11-08 22:54:20	03
+
+7ccdc29c2474407ca4bcb1b51d65cdfe	一级	Important	2021-11-08 20:50:32	04
+e08317b4ae304175bee1b9eae48f808f	三级	Important	2021-11-08 22:54:20	04
+258d2c57a27545c0a1eec33727b8033b	二级	Important	2021-11-08 21:05:34	04
+
+Project
+------
+144f807280c34ad290493591a5cae4cb	国际会展中心项目1			1		2021-10-24 22:22:31
+283b26c29ac148b1bdea47f019151713	智慧小区项目2			1		2021-10-24 22:22:31
+36494b53277c4e25bf9ca2e0e23e4e38	未来城市项目3			1		2021-10-24 22:22:31
+
+
+============================================================
+CREATE TABLE t_user (
+  user_id char(32) NOT NULL,
+  user_name varchar(50) DEFAULT NULL,
+  tel char(50) DEFAULT NULL,
+  superior_user_id char(32) DEFAULT NULL,
+  avatarUrl char(100) DEFAULT NULL,
+  create_time datetime DEFAULT CURRENT_TIMESTAMP,
+  user_status char(1) DEFAULT '1',
+  open_id char(50) DEFAULT NULL,
+  role_id char(32) DEFAULT NULL,
+  project_id char(32) DEFAULT NULL,
+  PRIMARY KEY (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE t_role (
+  role_id char(32) NOT NULL,
+  role_name varchar(50) DEFAULT NULL,
+  role_position varchar(50) DEFAULT NULL,
+  hint_level tinyint(4) DEFAULT NULL,
+  role_desc varchar(100) DEFAULT NULL,
+  create_time datetime DEFAULT NULL,
+  PRIMARY KEY (role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE t_project (
+  project_id char(32) NOT NULL,
+  project_name varchar(100) DEFAULT NULL,
+  project_admin_id char(32) DEFAULT NULL,
+  project_area_admin_id char(32) DEFAULT NULL,
+  project_status char(4) DEFAULT NULL,
+  project_desc varchar(1000) DEFAULT NULL,
+  create_time datetime DEFAULT NULL,
+  PRIMARY KEY (project_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE t_invite_code (
+  invite_code char(10) NOT NULL,
+  project_id char(32) DEFAULT NULL,
+  role_id char(32) DEFAULT NULL,
+  open_id char(50) DEFAULT NULL,
+  code_status tinyint(4) NOT NULL DEFAULT '0' COMMENT '0-Unused 1-Used 2-Discard',
+  used_time datetime DEFAULT NULL,
+  create_time datetime DEFAULT NULL,
+  PRIMARY KEY (invite_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE t_hint_record (
+  hint_record_id char(32) NOT NULL,
+  hint_id char(32) DEFAULT NULL,
+  user_id char(32) DEFAULT NULL,
+  record_content varchar(1000) DEFAULT NULL,
+  create_time datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (hint_record_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE t_hint_image (
+  hint_id char(32) NOT NULL,
+  img_id varchar(200) DEFAULT NULL,
+  PRIMARY KEY (hint_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE t_hint (
+  hint_id char(32) NOT NULL,
+  hint_name varchar(200) DEFAULT NULL,
+  hint_type_id char(32) DEFAULT NULL,
+  hint_level_id char(32) DEFAULT NULL,
+  item_type_id char(32) DEFAULT NULL,
+  customer_type_ids varchar(500) DEFAULT NULL,
+  project_id char(32) DEFAULT NULL,
+  province varchar(50) DEFAULT NULL,
+  city varchar(50) DEFAULT NULL,
+  district varchar(50) DEFAULT NULL,
+  corp_name varchar(200) DEFAULT NULL,
+  corp_address varchar(200) DEFAULT NULL,
+  customer_name varchar(100) DEFAULT NULL,
+  customer_contact varchar(100) DEFAULT NULL,
+  remark varchar(500) DEFAULT NULL,
+  hint_from char(1) DEFAULT NULL,
+  user_id char(32) DEFAULT NULL,
+  hint_status char(1) DEFAULT NULL,
+  audit_status char(1) DEFAULT NULL,
+  valid_starttime datetime DEFAULT NULL,
+  valid_endtime datetime DEFAULT NULL,
+  claim_time datetime DEFAULT NULL,
+  create_time datetime DEFAULT CURRENT_TIMESTAMP,
+  update_time datetime DEFAULT CURRENT_TIMESTAMP,
+  audit_time datetime DEFAULT NULL,
+  PRIMARY KEY (hint_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE t_dict (
+  dict_id char(32) NOT NULL,
+  dict_name varchar(50) DEFAULT NULL,
+  dict_desc varchar(200) DEFAULT NULL,
+  create_time datetime DEFAULT CURRENT_TIMESTAMP,
+  dict_type char(2) DEFAULT NULL,
+  update_time datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (dict_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

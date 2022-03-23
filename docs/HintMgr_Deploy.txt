@@ -1,0 +1,78 @@
+cd /home/ubuntu
+sudo su
+
+ps -ef | grep java | grep -v 'grep' | awk '{print $2}'  | xargs kill -9
+rm hintmgr.jar
+nohup java -jar hintmgr.jar &
+
+Restart(sh restart.sh)
+-----------------------
+ps -ef | grep java | grep -v 'grep' | awk '{print $2}'  | xargs kill -9
+nohup java -jar hintmgr.jar &
+
+Redeploy
+---------------------
+ps -ef | grep java | grep -v 'grep' | awk '{print $2}'  | xargs kill -9
+rm hintmgr.jar
+mv hintmgr2.jar hintmgr.jar
+
+nohup java -jar hintmgr.jar &
+
+Deploy Manual
+==================================================================================================
+1) Prepare files:
+hintmgr.jar
+application.yml
+/home/ubuntu/cert/6562146_bex.rainchapter.com.pem;
+/home/ubuntu/cert/6562146_bex.rainchapter.com.key;
+
+2) Config application.yml
+1. 
+port: 8080
+
+2. DB
+spring:
+    datasource:
+        url: jdbc:mysql://localhost:3306/pim?useUnicode=true&characterEncoding=UTF8&allowMultiQueries=true&useSSL=false
+        username: hintmgr
+        password: "secret123#"
+
+3. Config Path, MiniAPP
+appConf:
+    //Put files here: city.js, HintTemplate.xlsx  
+    configPath: /home/ubuntu/
+    
+    rootPwd: pDs+kBgy/KYr1LS8HJuogQ==
+    appId: wx29e9554342438527
+    appSecret: c8f9cb4a6ff8c8e14bb347aaf4a6dbe1
+
+4. OSS
+oss:
+    endpoint: "https://oss-cn-guangzhou.aliyuncs.com"
+    accessKey: "LTAI5t8M6cuo3dFJHoN1ZrqM"
+    secretKey: "SCEcwVfnY1yYmrVP16tty3bcxCDrsm"
+    bucket: "sw-clue"
+
+3) Start(If require to add RAM to 2G: -Xmx2g)
+nohup java -Xmx1g -jar hintmgr.jar &
+
+4) Start Nginx (Note: the first line: user xxx)
+------------------------------------------------
+1. /etc/nginx/nginx.conf
+
+root          /home/ubuntu/web/dist;
+
+location /HintMgrAPI/ {
+    proxy_pass http://127.0.0.1:8080/;
+    proxy_connect_timeout 600;
+    proxy_send_timeout 600;
+    proxy_read_timeout 600;
+}
+
+server_name bex.rainchapter.com;
+ssl on;
+ssl_certificate     /home/ubuntu/cert/6562146_bex.rainchapter.com.pem;
+ssl_certificate_key /home/ubuntu/cert/6562146_bex.rainchapter.com.key;
+
+2. Start
+./nginx

@@ -1,0 +1,221 @@
+18825070645 江牧 OpenID  oWJfU4kcRjDMHtRWN6XplFOOPu1w
+2021-11-28 体验版
+2021-12-08 上线
+
+Prototype: https://axhub.im/ax9/76a36ef067892e95/#id=ejw9dx&p=邀请页&g=1
+UI: https://www.figma.com/file/glMxMFbHl4Hy75e6FDBFwk/Vae?node-id=0%3A1
+Bug: https://docs.qq.com/sheet/DVGpLelpSemd3TEFm
+
+上传图片使用第三方oss: 
+Endpoint： oss-cn-guangzhou.aliyuncs.com
+测试账号密码信息：
+access_key: LTAI5t8M6cuo3dFJHoN1ZrqM
+secret: SCEcwVfnY1yYmrVP16tty3bcxCDrsm
+bucket: sw-clue
+
+测试小程序：
+appid：wx5d20bbaa4edaae10
+secret：7248c88ec055b4f77786de1bf5d7697d
+
+测试服务器  //Ubuntu  18.04.4 LTS (Bionic Beaver)
+----------------------------------------------------------
+ip: 119.91.195.217
+账号: ubuntu
+密码: |f8z9ZhmU%_@
+域名：https://bex.rainchapter.com
+http://119.91.195.217:443
+http://bex.rainchapter.com:443
+
+https://bex.rainchapter.com/HintMgrAPI/hintmgr/swagger-ui.html
+https://bex.rainchapter.com/HintMgrAPI/hintmgr/dummy/sysInfo
+
+proxy_redirect http://127.0.0.1:8080/
+
+Install Nginx
+------
+apt install nginx
+vim /etc/nginx/nginx.conf
+/home/ubuntu/web
+chown ubuntu:ubuntu
+
+Install JDK
+------
+apt list | grep openjdk-8
+apt list | grep mysql
+
+apt install openjdk-8-jre-headless
+
+Install MySQL
+------
+apt install mysql-server-5.7
+mysql_secure_installation
+root root
+
+systemctl status mysql.service
+systemctl restart mysql.service
+mysql -uroot -p
+grant all privileges on *.* to root@'%' identified by 'root';
+grant all privileges on *.* to hintmgr@'%' identified by 'secret123#';
+CREATE DATABASE pim DEFAULT CHARACTER SET utf8mb4;
+
+systemctl status nginx.service
+nginx -t
+
+curl http://127.0.0.1:8080/hintmgr/dummy/sysInfo
+https://bex.rainchapter.com/HintMgrAPI/hintmgr/dummy/sysInfo
+https://bex.rainchapter.com/HintMgrAPI/hintmgr/admin/dicts?dict_type=02
+
+GET http://localhost:8080/hintmgr/swagger-ui.html
+GET http://localhost:8080/hintmgr/dummy/sysInfo //NoLogin
+GET http://localhost:8080/hintmgr/dummy/list    //NoLogin,DB
+
+GET http://localhost:8080/hintmgr/admin/assignHint?sessionId=1234&hint_id=a0899288a1084b06810ab63ae1221198&user_id=area01
+GET http://localhost:8080/hintmgr/admin/assignHint?sessionId=1234&hint_id=2ff9fa79a0964816b21a16360b4cab4b&user_id=sale01
+GET http://localhost:8080/hintmgr/admin/assignHint?sessionId=1234&hint_id=9fda7fbc9a4f45259c7c61320178d030&user_id=sale01
+
+GET http://47.100.122.195:8080/hintmgr/swagger-ui.html
+GET http://47.100.122.195:8080/hintmgr/dummy/sysInfo
+GET http://47.100.122.195:8080/hintmgr/dummy/list
+
+rm hintmgr.jar
+ps -ef | grep java | grep -v 'grep' | awk '{print $2}'  | xargs kill -9
+nohup java -jar hintmgr.jar &
+
+curl http://localhost:8090/hintmgr/dummy/sysInfo
+http://localhost:8080/hintmgr/admin/adminUsers?sessionId=1234&project_id=333
+http://localhost:8080/hintmgr/admin/projectMembers?sessionId=1234&project_id=144f807280c34ad290493591a5cae4cb
+http://localhost:8080/hintmgr/admin/projectMembers?sessionId=1234&project_id=123
+
+http://119.91.195.217:8080/hintmgr/swagger-ui.html
+http://119.91.195.217:8090/hintmgr/dummy/sysInfo
+
+wget 119.91.195.217:3306
+telnet 119.91.195.217:3306
+
+wget 119.91.195.217:8090
+telnet 119.91.195.217 8090
+
+wget 47.100.122.195:8080
+telnet 47.100.122.195 8080
+
+wget 47.100.122.195:3306
+telnet 47.100.122.195 3306
+
+Dev 
+---------------------------------------------------------------------
+D:\workspace\workspace_ee\HintMgrApp>java -version
+java version "1.8.0_112"
+Java(TM) SE Runtime Environment (build 1.8.0_112-b15)
+Java HotSpot(TM) Client VM (build 25.112-b15, mixed mode)
+
+[root@iZuf6444os9q8ftdj3f3zpZ ~]# java -version
+openjdk version "1.8.0_302"
+OpenJDK Runtime Environment (build 1.8.0_302-b08)
+OpenJDK 64-Bit Server VM (build 25.302-b08, mixed mode)
+
+====================================
+ADMIN 
+    Account1    AOKZU0WODt/lwFsWlKNh932lhfKAehHDgIrX8Q9kI3XySzOGnekyecnmF+uln+ptFY+jmPA/J1pSvMJcAiQ9wimh/c/GqcA7+sy3ouC515I=
+
+区域管理员 [userId=area01, rolePosition=1]  AOKZU0WODt/lwFsWlKNh971Tha/GmsDTKgaYlxAmkqXS80wYh5WnTZsT9hGS8/m7
+                   area02                   AOKZU0WODt/lwFsWlKNh971Tha/GmsDTKgaYlxAmkqXdExsHqVV3BbAoYdrVFZid
+
+项目管理员 [userId=proj01, rolePosition=2]  AOKZU0WODt/lwFsWlKNh93OI/5riAQcBlPn2dmdU4JUZzttjkyBw/B34mjcG/3Ph
+                   pr0j02                   AOKZU0WODt/lwFsWlKNh93OI/5riAQcBlPn2dmdU4JXTyv/ZOLESLTi2j8EPF8b1
+
+销售员     [userId=sale01, rolePosition=3]  AOKZU0WODt/lwFsWlKNh98i4oSVjc1eK4NqL8ZOib4JVHpEdAujN3p/DObTUOFkx
+                   sale02                   AOKZU0WODt/lwFsWlKNh98i4oSVjc1eK4NqL8ZOib4LQhcPtYkGTO8Nkvv2Hvggf
+                   sale03                   AOKZU0WODt/lwFsWlKNh98i4oSVjc1eK4NqL8ZOib4J9eRUAoXwK+m7odcYjpmss
+拓客员     [userId=build01, rolePosition=4] AOKZU0WODt/lwFsWlKNh9xXYltiEbIiNtr/QFWvidEsMvuap+zeM4GwBM9nxR99q
+                   build02                  AOKZU0WODt/lwFsWlKNh9xXYltiEbIiNtr/QFWvidEuwFKO3fZZRnTTS6O9LcgPn
+====================================
+
+-Xmx1g
+
+GET /app/mgr/runningProjects
+
+
+set time_zone='+8:00';
+
+AOKZU0WODt/lwFsWlKNh9/2Mwt/eigUQqxINwPhmHz0plA/IQBF6zKgpII+By3aNhI0t8r54lE79TfGzWJMKp11GHGqE2/RQLSAP9ziHQZQ=
+
+
+AliYun 阿里云 114.55.8.6 4U8G CentOS 7.9 (root Root1234)  //Apply by Jiangmu at 2022-03-07
+---------------------------------------------
+
+Install JDK on CentOS 7.9
+------
+cat /etc/redhat-release
+CentOS Linux release 7.9.2009 
+
+Check
+rpm -qa |grep java
+rpm -qa |grep jdk
+rpm -qa |grep gcj
+
+If has, then uninstall: 
+rpm -qa | grep java | xargs rpm -e --nodeps 
+
+yum list | grep java-1.8
+yum list | grep mysql
+
+yum install java-1.8.0-openjdk.x86_64
+yum install java-1.8.0-openjdk* -y
+// -y, --assumeyes  //Assume yes; assume that the answer to any question which would be asked is yes.
+
+Installed: java-1.8.0-openjdk.x86_64 1:1.8.0.322.b06-1.el7_9
+
+Install MySQL on CentOS 7.9
+------
+wget http://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+
+yum -y install mysql57-community-release-el7-11.noarch.rpm
+
+yum repolist enabled | grep mysql.*
+
+yum install mysql-community-server -y
+
+The GPG keys listed for the "MySQL 5.7 Community Server" repository are already installed but they are not correct for this package.
+
+Q:
+systemctl start mysqld.service
+Failed to start mysqld.service: Unit not found.
+
+A:
+rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+yum install -y mysql-server
+
+
+systemctl start mysqld.service
+systemctl enable mysqld.service   //Add to start when launch (boot)
+
+See initial password for root:
+grep "password" /var/log/mysqld.log
+
+A temporary password is generated for root@localhost: /G*ocDrj=2te
+mysql -uroot -p
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'Root123#';
+
+show databases;
+
+CREATE DATABASE pim DEFAULT CHARACTER SET utf8mb4;
+
+DROP TABLE IF EXISTS `sys_role`;
+CREATE TABLE `sys_role` (
+  `role_id` char(32) NOT NULL,
+  `role_name` varchar(50) DEFAULT NULL,
+  `role_desc` varchar(200) DEFAULT NULL,
+  `role_authories` varchar(1000) DEFAULT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of sys_role
+-- ----------------------------
+INSERT INTO `sys_role` VALUES ('1bb60038e24c46a6aaa3be93cce14807', 'Role0', 'Role Desc0', '[\"/adminManage\",\"/clueLevel\",\"/clueManage\",\"/flowerClue\",\"/clueType\"]', '2021-12-06 19:45:11');
+
+
+
+http://114.55.8.6:8080/hintmgr/dummy/sysInfo

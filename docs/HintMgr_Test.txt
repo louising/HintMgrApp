@@ -1,0 +1,239 @@
+
+
+/dummy/loginAdmin
+{
+    "loginName":"Account1",
+    "loginPwd":"Secret1"
+}
+sessionId:  1lBscuxBx7bYPFFmPuPq9hYws+KR7bhkNlKsbeIjp6o=
+e0d1d96ff3174994970a923ee2382ac7
+
+[2021-11-28 07:12:43.740] INFO  [http-nio-8080-exec-6] com.zero.hintmgr.util.BaseUtil [BaseUtil.java:51] - 
+S1: 2b7b8610233b4137813c2bf26f4a0f4b=2021-11-28 07:12:43 S2: lNFqG8sDUHpHasYZ0/R+rHY4T5vbYB+FeGbKZmTigDbmKGkCJ/JW41i6rlnphJFpuCOeTj2NU5Iz
+
+lNFqG8sDUHpHasYZ0/R+rHY4T5vbYB+FeGbKZmTigDbmKGkCJ/JW41i6rlnphJFpuCOeTj2NU5Iz\r\nMk28zecpvw==
+
+Secret1
+    kykx8Zbf3iY=   //OpenJDK 64-Bit Server VM (build 25.302-b08
+    1W21WcZ0G6M=   //Java HotSpot(TM) Client VM (build 25.112-b15 1.8.0_112
+
+http://localhost:8080/hintmgr/admin/setUserStatus?user_id=86130c4ac600406097d2b12d68463d6a&user_status=1
+
+/saveSysRole
+{
+"role_name": "Role101",
+"role_desc": "Role101 Desc",
+"role_authories": "[\"/adminManage\",\"/clueLevel\",\"/clueManage\",\"/flowerClue\",\"/clueType\"]"
+}
+
+{
+"role_id": "163a1187473d4217a8be64d1082d25b1",
+"role_name": "Role101 New",
+"role_desc": "Role101 Desc New",
+"role_authories": "[\"/adminManage\",\"/clueLevel\",\"/clueManage\",\"/flowerClue\"]"
+}
+
+/saveSysUser
+
+{
+"login_name":"alice",
+"login_pwd":"secret",
+"user_name":"Alice Lee",
+"role_id":"role001",
+"remark":"Remark001"
+}
+
+{
+"user_id":"41d9c750f4c6483c9803622b43111787",
+"login_name":"alice01 New",
+"login_pwd":"secret111",
+"user_name":"Alice Name01 New",
+"role_id":"role001 New",
+"remark":"Remark001 New"
+}
+
+/saveProject
+{
+   "project_id": "64af32d21a67406b9499299d544ecf57",
+   "project_name": "New",   
+   "project_area_admin_id": "area01",
+   "project_admin_id": "proj01",
+   "project_desc": "New Desc"
+}
+{
+   "project_name": "Project 01",   
+   "project_area_admin_id": "",
+   "project_admin_id": "proj02",
+   "project_desc": "Project Desc"
+}
+
+
+/saveDict
+{    
+    "dict_name": "苹果",
+    "dict_desc": "苹果 Desc",
+    "dict_type": "30"
+}
+
+Hint
+--------------------------------
+saveHint
+{
+    "hint_id": "9a60cd84117b4ffe87dc507f8080314e",
+    "hint_name": "线索100德国 new",
+
+    "hint_level_id": "258d2c57a27545c0a1eec33727b8033b",
+    "hint_type_id": "5c3595e09acc447ea8d30c3729990308",
+    "item_type_id": "5c3595e09acc447ea8d30c3729990308",
+    "project_id": "144f807280c34ad290493591a5cae4cb",
+
+    "corp_name": "甲骨文Oracle new",
+    "province": "广东省 new",
+    "city": "深圳市 bew",
+    "district": "罗湖区",
+    "corp_address": "银河村秋天组",
+
+    "valid_starttime": "2022-01-06",
+    "valid_endtime": "2022-02-07",
+
+    "customer_name": "张先生",
+    "customer_type_ids": "090e4d483b8a496cb4980e3cb6e7b79d",
+    "customer_contact": "13022334455",
+    "remark": "高级客户线索"
+}
+"hint_id": ""
+
+/hints
+{}
+{
+"project_name":"会展",
+"item_type_name":"银行",
+"corp_name":"苹果",
+"customer_name":"李"
+}
+
+/auditHint
+{
+    "hint_id": "4315847db8cc4bdb85370c19f1cdea59",
+    "audit_status": "1",
+    "audit_result": "OK"
+}
+
+5236d9e90d58480cbdf121fe1bea2da9
+--------------------------------
+{
+    "loginName":"Account1",
+    "loginPwd":"Secret1"
+}
+
+/setProjectAdmin
+{
+    "project_id": "de8b00909461477880bf78ac4efa3e6",
+    "project_area_admin_id": "area01",
+    "project_admin_id": ""
+}
+
+/users 修改为    /projectUsers
+/setMember 修改为 POST /setProjectMembers
+/nonProjectUsers 查询不在任何项目中的销售员和拓客员, 用来查找用户 添加到项目成员
+
+POST /setProjectMembers
+{
+    "project_id": "144f807280c34ad290493591a5cae4cb",    
+    "userIds": "build01,build02",
+    "operType": "2"
+}
+
+POST /moveMembers
+[
+    {
+        "user_id": "area01",
+        "role_position": "1"
+    },
+    {
+        "user_id": "proj01",
+        "role_position": "2"
+    },
+    {
+        "user_id": "build01",
+        "role_position": "4"
+    },
+    {
+        "user_id": "build02",
+        "role_position": "4"
+    },
+    {
+        "user_id": "sale01",
+        "role_position": "3"
+    }    
+]
+
+POST /saveRole
+"role_id": "",
+{
+   "role_id": "c45aefbda91941dcb977357455be1779",
+   "role_name": "Role002 New",
+   "role_position": "3",
+   "hint_level_id": "2ccdc29c2474407ca4bcb1b51d65cdfe",
+   "role_desc": "Role 002 New"
+}
+
+角色关系
+-----------------------------------------------------------------------
+区域经理1
+    项目经理1
+        销售员1
+        销售员2
+        销售员3
+        拓客员1
+    项目经理2
+        销售员4
+        销售员5
+        拓客员2
+区域经理2
+    项目经理3
+        销售员6
+        拓客员3
+
+流程1: 管理员->邀请码->项目 (项目-管理员)
+-----------------------------------------------------------------------
+1. 创建项目，区域管理员:null 项目管理员:null
+2. 创建角色(线索级别)
+3. 创建邀请码(项目, 角色)
+4. 用户通过邀请码注册(索数项目, 角色) ==> 区域管理员,项目管理员,用户
+5. 修改项目(选择 区域管理员/项目管理员)
+
+流程2: 公共线索池(project, level, audit_status=1, user_id = null)
+-----------------------------------------------------------------------
+测试接口
+    GET /app/user/publicHints 公共线索池
+    GET /app/user/myHints 我的线索
+    GET /app/user/freeHint 退回线索
+    GET /app/user/askHint 认领线索
+
+初始数据准备:
+
+用户
+--------
+sale01(项目1，角色1, 线索级别1) 岗位 销售员 已经认领3条  
+sale02(项目1，角色1, 线索级别1) 岗位 销售员 已经认领4条
+
+线索 16条
+--------
+线索10 (project01,level01,audit_status=1) 项目1 级别1 已审批 10条 
+线索2(project01, level02)                 项目1 级别2 已审批 2条
+线索1(project01, level=1, audit_status=0) 项目1 级别1 未审批 1条
+线索1(project01, level=1, audit_status=2) 项目1 级别1   拒绝 1条
+线索2(project02, level=1, audit_status=1) 项目2 级别1   通过 2条
+
+1. 查看 我的线索, 公共线索池   
+    sale01(项目1，角色1, 线索级别1 我的认领 3): 公共线索池 3(项目1，级别1) 
+    sale02(项目1，角色1, 线索级别1 我的认领 4): 公共线索池 3(项目1，级别1) 
+2. sale01 退回一个线索
+3. 查看 我的线索, 公共线索池 
+    sale01 (项目1，级别1 我的认领2) 公共线索池 4 
+    sale02 (项目1，级别1 我的认领4) 公共线索池 4
+4. sale02 认领一个线索
+5. 查看 查看 我的线索, 公共线索池 
+    sale01(我的认领2 ) 公共线索池 3
+    sale02(我的认领5 ) 公共线索池 3
