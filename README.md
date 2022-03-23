@@ -63,17 +63,17 @@ application.yml
 /home/ubuntu/cert/6562146_bex.rainchapter.com.key;
 
 2) Config application.yml
-1. Port
+* Port
 port: 8080
 
-2. DB
+* DB
 spring:
     datasource:
         url: jdbc:mysql://localhost:3306/pim?useUnicode=true&characterEncoding=UTF8&allowMultiQueries=true&useSSL=false
         username: hintmgr
         password: "xxx"
 
-3. Path, MiniAPP
+* Path, MiniAPP
 appConf:
     //Put files here: city.js, HintTemplate.xlsx  
     configPath: /home/ubuntu/
@@ -82,18 +82,18 @@ appConf:
     appId: xxx
     appSecret: xxx
 
-4.OSS
+* OSS
 oss:
     endpoint: "https://oss-cn-guangzhou.aliyuncs.com"
     accessKey: "xxx"
     secretKey: "xxx"
     bucket: "sw-clue"
 
-3) Start(If require to add RAM to 2G: -Xmx2g)
+3) Start Java Backend RESTful Service
 nohup java -Xmx1g -jar hintmgr.jar &
 
 4) Start Nginx (Note: the first line: user xxx)
-1. /etc/nginx/nginx.conf
+* /etc/nginx/nginx.conf
 
 root /home/ubuntu/web/dist;
 
@@ -109,7 +109,7 @@ ssl on;
 ssl_certificate     /home/ubuntu/cert/6562146_bex.xxx.com.pem;
 ssl_certificate_key /home/ubuntu/cert/6562146_bex.xxx.com.key;
 
-2. Start
+* Start
 ./nginx
 
 Install Nginx
@@ -215,9 +215,7 @@ CREATE TABLE `sys_role` (
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- ----------------------------
 -- Records of sys_role
--- ----------------------------
 INSERT INTO `sys_role` VALUES ('1bb60038e24c46a6aaa3be93cce14807', 'Role0', 'Role Desc0', '[\"/adminManage\",\"/clueLevel\",\"/clueManage\",\"/flowerClue\",\"/clueType\"]', '2021-12-06 19:45:11');
 
 http://114.55.8.6:8080/hintmgr/dummy/sysInfo
@@ -260,43 +258,43 @@ Role
 Case1: 管理员->邀请码->项目 (项目-管理员)
 -----------------------------------------------------------------------
 1. 创建项目，区域管理员:null 项目管理员:null
-2. 创建角色(线索级别)
+2. 创建角色(HintLevel)
 3. 创建邀请码(项目, 角色)
 4. 用户通过邀请码注册(索数项目, 角色) ==> 区域管理员,项目管理员,用户
 5. 修改项目(选择 区域管理员/项目管理员)
 
-Case2: 公共线索池(project, level, audit_status=1, user_id = null)
+Case2: Public-Hint-Pool(project, level, audit_status=1, user_id = null)
 -----------------------------------------------------------------------
 测试接口
-    GET /app/user/publicHints 公共线索池
-    GET /app/user/myHints 我的线索
-    GET /app/user/freeHint 退回线索
-    GET /app/user/askHint 认领线索
+    GET /app/user/publicHints Public-Hint-Pool
+    GET /app/user/myHints My-Hint
+    GET /app/user/freeHint Free-Hint
+    GET /app/user/askHint Ask-Hint
 
 用户
 --------
-sale01(项目1，角色1, 线索级别1) 岗位 销售员 已经认领3条  
-sale02(项目1，角色1, 线索级别1) 岗位 销售员 已经认领4条
+sale01(项目1，角色1, HintLevel1) 岗位 销售员 已经认领3条  
+sale02(项目1，角色1, HintLevel1) 岗位 销售员 已经认领4条
 
-线索 16条
+Hint 16条
 --------
-线索10 (project01,level01,audit_status=1) 项目1 级别1 已审批 10条 
-线索2(project01, level02)                 项目1 级别2 已审批 2条
-线索1(project01, level=1, audit_status=0) 项目1 级别1 未审批 1条
-线索1(project01, level=1, audit_status=2) 项目1 级别1   拒绝 1条
-线索2(project02, level=1, audit_status=1) 项目2 级别1   通过 2条
+Hint10 (project01,level01,audit_status=1) 项目1 级别1 已审批 10条 
+Hint2(project01, level02)                 项目1 级别2 已审批 2条
+Hint1(project01, level=1, audit_status=0) 项目1 级别1 未审批 1条
+Hint1(project01, level=1, audit_status=2) 项目1 级别1   拒绝 1条
+Hint2(project02, level=1, audit_status=1) 项目2 级别1   通过 2条
 
-1. 查看 我的线索, 公共线索池   
-    sale01(项目1，角色1, 线索级别1 我的认领 3): 公共线索池 3(项目1，级别1) 
-    sale02(项目1，角色1, 线索级别1 我的认领 4): 公共线索池 3(项目1，级别1) 
-2. sale01 退回一个线索
-3. 查看 我的线索, 公共线索池 
-    sale01 (项目1，级别1 我的认领2) 公共线索池 4 
-    sale02 (项目1，级别1 我的认领4) 公共线索池 4
-4. sale02 认领一个线索
-5. 查看 查看 我的线索, 公共线索池 
-    sale01(我的认领2 ) 公共线索池 3
-    sale02(我的认领5 ) 公共线索池 3
+1. 查看 My-Hint, Public-Hint-Pool   
+    sale01(项目1，角色1, HintLevel1 我的认领 3): Public-Hint-Pool 3(项目1，级别1) 
+    sale02(项目1，角色1, HintLevel1 我的认领 4): Public-Hint-Pool 3(项目1，级别1) 
+2. sale01 退回一个Hint
+3. 查看 My-Hint, Public-Hint-Pool 
+    sale01 (项目1，级别1 我的认领2) Public-Hint-Pool 4 
+    sale02 (项目1，级别1 我的认领4) Public-Hint-Pool 4
+4. sale02 认领一个Hint
+5. 查看 My-Hint, Public-Hint-Pool 
+    sale01(我的认领2 ) Public-Hint-Pool 3
+    sale02(我的认领5 ) Public-Hint-Pool 3
 
 It demonstrates these features
 -------------------------------    
@@ -429,4 +427,4 @@ C. Encryption/Decryption
     
 D. Session management(just for simple demo, in product environment should use SSL and encrypted cookie, or SSO)
    SessionManager.java
-              
+
