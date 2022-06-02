@@ -34,24 +34,24 @@ port: 8080
 spring:
     datasource:
         url: jdbc:mysql://localhost:3306/pim?useUnicode=true&characterEncoding=UTF8&allowMultiQueries=true&useSSL=false
-        username: hintmgr
-        password: "secret123#"
+        username: xxx
+        password: "xxx"
 
 3. Config Path, MiniAPP
 appConf:
     //Put files here: city.js, HintTemplate.xlsx  
     configPath: /home/ubuntu/
     
-    rootPwd: pDs+kBgy/KYr1LS8HJuogQ==
-    appId: wx29e9554342438527
-    appSecret: c8f9cb4a6ff8c8e14bb347aaf4a6dbe1
+    rootPwd: xxx
+    appId: xxx
+    appSecret: xxx
 
 4. OSS
 oss:
     endpoint: "https://oss-cn-guangzhou.aliyuncs.com"
-    accessKey: "LTAI5t8M6cuo3dFJHoN1ZrqM"
-    secretKey: "SCEcwVfnY1yYmrVP16tty3bcxCDrsm"
-    bucket: "sw-clue"
+    accessKey: "xxx"
+    secretKey: "xxx"
+    bucket: "xxx"
 
 3) Start(If require to add RAM to 2G: -Xmx2g)
 nohup java -Xmx1g -jar hintmgr.jar &
