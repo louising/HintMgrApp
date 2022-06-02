@@ -1,35 +1,12 @@
-18825070645 Ω≠ƒ¡ OpenID  oWJfU4kcRjDMHtRWN6XplFOOPu1w
-2021-11-28 ÃÂ—È∞Ê
-2021-12-08 …œœﬂ
+2021-11-28 ‰ΩìÈ™åÁâà
+2021-12-08 ‰∏äÁ∫ø
 
-Prototype: https://axhub.im/ax9/76a36ef067892e95/#id=ejw9dx&p=—˚«Î“≥&g=1
+Prototype: https://axhub.im/ax9/76a36ef067892e95/#id=ejw9dx&p=ÈÇÄËØ∑È°µ&g=1
 UI: https://www.figma.com/file/glMxMFbHl4Hy75e6FDBFwk/Vae?node-id=0%3A1
 Bug: https://docs.qq.com/sheet/DVGpLelpSemd3TEFm
 
-…œ¥´Õº∆¨ π”√µ⁄»˝∑Ωoss: 
-Endpoint£∫ oss-cn-guangzhou.aliyuncs.com
-≤‚ ‘’À∫≈√‹¬Î–≈œ¢£∫
-access_key: LTAI5t8M6cuo3dFJHoN1ZrqM
-secret: SCEcwVfnY1yYmrVP16tty3bcxCDrsm
-bucket: sw-clue
 
-≤‚ ‘–°≥Ã–Ú£∫
-appid£∫wx5d20bbaa4edaae10
-secret£∫7248c88ec055b4f77786de1bf5d7697d
 
-≤‚ ‘∑˛ŒÒ∆˜  //Ubuntu  18.04.4 LTS (Bionic Beaver)
-----------------------------------------------------------
-ip: 119.91.195.217
-’À∫≈: ubuntu
-√‹¬Î: |f8z9ZhmU%_@
-”Ú√˚£∫https://bex.rainchapter.com
-http://119.91.195.217:443
-http://bex.rainchapter.com:443
-
-https://bex.rainchapter.com/HintMgrAPI/hintmgr/swagger-ui.html
-https://bex.rainchapter.com/HintMgrAPI/hintmgr/dummy/sysInfo
-
-proxy_redirect http://127.0.0.1:8080/
 
 Install Nginx
 ------
@@ -117,16 +94,16 @@ OpenJDK 64-Bit Server VM (build 25.302-b08, mixed mode)
 ADMIN 
     Account1    AOKZU0WODt/lwFsWlKNh932lhfKAehHDgIrX8Q9kI3XySzOGnekyecnmF+uln+ptFY+jmPA/J1pSvMJcAiQ9wimh/c/GqcA7+sy3ouC515I=
 
-«¯”Úπ‹¿Ì‘± [userId=area01, rolePosition=1]  AOKZU0WODt/lwFsWlKNh971Tha/GmsDTKgaYlxAmkqXS80wYh5WnTZsT9hGS8/m7
+Âå∫ÂüüÁÆ°ÁêÜÂëò [userId=area01, rolePosition=1]  AOKZU0WODt/lwFsWlKNh971Tha/GmsDTKgaYlxAmkqXS80wYh5WnTZsT9hGS8/m7
                    area02                   AOKZU0WODt/lwFsWlKNh971Tha/GmsDTKgaYlxAmkqXdExsHqVV3BbAoYdrVFZid
 
-œÓƒøπ‹¿Ì‘± [userId=proj01, rolePosition=2]  AOKZU0WODt/lwFsWlKNh93OI/5riAQcBlPn2dmdU4JUZzttjkyBw/B34mjcG/3Ph
+È°πÁõÆÁÆ°ÁêÜÂëò [userId=proj01, rolePosition=2]  AOKZU0WODt/lwFsWlKNh93OI/5riAQcBlPn2dmdU4JUZzttjkyBw/B34mjcG/3Ph
                    pr0j02                   AOKZU0WODt/lwFsWlKNh93OI/5riAQcBlPn2dmdU4JXTyv/ZOLESLTi2j8EPF8b1
 
-œ˙ €‘±     [userId=sale01, rolePosition=3]  AOKZU0WODt/lwFsWlKNh98i4oSVjc1eK4NqL8ZOib4JVHpEdAujN3p/DObTUOFkx
+ÈîÄÂîÆÂëò     [userId=sale01, rolePosition=3]  AOKZU0WODt/lwFsWlKNh98i4oSVjc1eK4NqL8ZOib4JVHpEdAujN3p/DObTUOFkx
                    sale02                   AOKZU0WODt/lwFsWlKNh98i4oSVjc1eK4NqL8ZOib4LQhcPtYkGTO8Nkvv2Hvggf
                    sale03                   AOKZU0WODt/lwFsWlKNh98i4oSVjc1eK4NqL8ZOib4J9eRUAoXwK+m7odcYjpmss
-ÕÿøÕ‘±     [userId=build01, rolePosition=4] AOKZU0WODt/lwFsWlKNh9xXYltiEbIiNtr/QFWvidEsMvuap+zeM4GwBM9nxR99q
+ÊãìÂÆ¢Âëò     [userId=build01, rolePosition=4] AOKZU0WODt/lwFsWlKNh9xXYltiEbIiNtr/QFWvidEsMvuap+zeM4GwBM9nxR99q
                    build02                  AOKZU0WODt/lwFsWlKNh9xXYltiEbIiNtr/QFWvidEuwFKO3fZZRnTTS6O9LcgPn
 ====================================
 
@@ -140,7 +117,7 @@ set time_zone='+8:00';
 AOKZU0WODt/lwFsWlKNh9/2Mwt/eigUQqxINwPhmHz0plA/IQBF6zKgpII+By3aNhI0t8r54lE79TfGzWJMKp11GHGqE2/RQLSAP9ziHQZQ=
 
 
-AliYun ∞¢¿Ô‘∆ 114.55.8.6 4U8G CentOS 7.9 (root Root1234)  //Apply by Jiangmu at 2022-03-07
+AliYun ÈòøÈáå‰∫ë 114.55.8.6 4U8G CentOS 7.9  //Apply by Jiangmu at 2022-03-07
 ---------------------------------------------
 
 Install JDK on CentOS 7.9
